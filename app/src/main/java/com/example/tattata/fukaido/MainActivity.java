@@ -1,5 +1,6 @@
 package com.example.tattata.fukaido;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,8 +28,14 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if("123".equals(editKion.getText().toString()) && "456".equals(editShitsudo.getText().toString())) {
+                    Intent intent = new Intent(MainActivity.this, GameActivity.class);
+                    startActivity(intent);
+                    return;
+                }
                 double kion = 0.0;
                 double shitsudo = 0.0;
+                //初期化
                 textResult.setText("");
                 //計算
                 try {
