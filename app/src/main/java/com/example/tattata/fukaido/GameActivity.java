@@ -1,5 +1,6 @@
 package com.example.tattata.fukaido;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
@@ -9,7 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,9 +27,12 @@ public class GameActivity extends AppCompatActivity {
     TextView enemy1;
     TextView timeView;
     ConstraintLayout layout;
+    Button modoruButton;
+
     int sceneTop;
     int sceneX;
     int sceneY;
+    double result;
     Handler handler;
     Runnable r;
     List<Enemy> enemyList;
@@ -46,6 +52,17 @@ public class GameActivity extends AppCompatActivity {
         playerImage = (ImageView)findViewById(R.id.playerImage);
         enemy1 = (TextView)findViewById(R.id.enemy1);
         layout = (ConstraintLayout)findViewById(R.id.layout);
+        modoruButton = (Button)findViewById(R.id.modoruButton);
+
+        modoruButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("RESULT", result);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
 
 
         enemyList.add(new Enemy(enemy1));
@@ -56,7 +73,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void run() {
                 // UIスレッド
-                timeView.setText(String.format("%.1f", (double)count / 10));
+                timeView.setText(String.format("%.1f", count / 12.5));
                 if(collisionDetect()) {
                     endProcessing(count);
                     return;
@@ -156,7 +173,8 @@ public class GameActivity extends AppCompatActivity {
         }
     }
     public void endProcessing(int count) {
-        timeView.setText(String.format("%.1f", (double)count / 10));
-        Toast.makeText(getApplicationContext(), String.format("あなたの不快指数は%.1fです!!", (double)count / 10), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "GAME OVER", Toast.LENGTH_LONG).show();
+        this.result = 100 - count / 12.5;
+        modoruButton.setVisibility(View.VISIBLE);
     }
 }
