@@ -41,14 +41,6 @@ public class Enemy {
     public int getMoveY() {
         return moveY;
     }
-
-    public void setMoveX(int moveX) {
-        this.moveX = moveX;
-    }
-
-    public void setMoveY(int moveY) {
-        this.moveY = moveY;
-    }
     public float getX() {
         return tv.getX();
     }
@@ -72,6 +64,9 @@ public class Enemy {
     }
     public void returnMoveY() {
         moveY *= -1;
+    }
+    public void setColor(int color) {
+        tv.setTextColor(color);
     }
 
 }

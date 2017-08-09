@@ -1,6 +1,9 @@
 package com.example.tattata.fukaido;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
@@ -18,8 +21,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
+/*
+Intentの参考https://akira-watson.com/android/activity-2.html
+ */
 public class GameActivity extends AppCompatActivity {
     private static final int TYO = 40;
 
@@ -28,7 +34,9 @@ public class GameActivity extends AppCompatActivity {
     TextView timeView;
     ConstraintLayout layout;
     Button modoruButton;
+    Button rankButton;
 
+    SharedPreferences pref;
     int sceneTop;
     int sceneX;
     int sceneY;
@@ -53,14 +61,43 @@ public class GameActivity extends AppCompatActivity {
         enemy1 = (TextView)findViewById(R.id.enemy1);
         layout = (ConstraintLayout)findViewById(R.id.layout);
         modoruButton = (Button)findViewById(R.id.modoruButton);
+        rankButton = (Button)findViewById(R.id.rankButton);
+
+
+        pref = getSharedPreferences("gamePref", MODE_PRIVATE);
 
         modoruButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putExtra("RESULT", result);
+                intent.putExtra("RESULT", 100 - result);
                 setResult(RESULT_OK, intent);
                 finish();
+            }
+        });
+        rankButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(GameActivity.this);
+                dialog.setTitle("ハイスコアランキング");
+                LinkedList<Float> list = new LinkedList<>();
+                for(int i = 0; i < 5; i++) {
+                    list.add(pref.getFloat("rank" + String.valueOf(i + 1), 0.0f));
+                }
+                TextView tv = new TextView(getApplicationContext());
+                int i = 1;
+                String msg = "";
+                for(Float f: list) {
+                    msg += String.format("%d位           %.1f\n", i, f);
+                    i++;
+                }
+                tv.setText(msg);
+                tv.setTextSize(24f);
+                tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                dialog.setView(tv);
+                //dialog.setMessage(msg);
+                dialog.setPositiveButton("OK", null);
+                dialog.create().show();
             }
         });
 
@@ -145,6 +182,7 @@ public class GameActivity extends AppCompatActivity {
                     || ex  < px + playerImage.getWidth()  - TYO && ex + e.getWidth()  > px + playerImage.getWidth() - TYO ) {
                 if(ey  < py + TYO && ey + e.getHeight()  > py + TYO
                         || ey  < py + playerImage.getHeight() - TYO && ey + e.getHeight()  > py + playerImage.getHeight() - TYO ) {
+                    e.setColor(Color.YELLOW);
                     return true;
                 }
             }
@@ -173,8 +211,37 @@ public class GameActivity extends AppCompatActivity {
         }
     }
     public void endProcessing(int count) {
-        Toast.makeText(getApplicationContext(), "GAME OVER", Toast.LENGTH_LONG).show();
-        this.result = 100 - count / 12.5;
+        this.result = count / 12.5;
+        playerImage.setRotation(-90.0f);
+        updateRanking();
         modoruButton.setVisibility(View.VISIBLE);
+        rankButton.setVisibility(View.VISIBLE);
+    }
+    public void updateRanking() {
+        LinkedList<Float> list = new LinkedList<>();
+        for(int i = 0; i < 5; i++) {
+           list.add(pref.getFloat("rank" + String.valueOf(i + 1), 0.0f));
+        }
+
+        int i = 0;
+        for(Float f:list) {
+            if(f <= this.result) {
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putFloat("rank" + String.valueOf(i), (float)this.result);
+                Toast.makeText(getApplicationContext(), "ハイスコア！！" + String.valueOf(i+1) + "位にランクイン！！", Toast.LENGTH_SHORT).show();
+
+                list.add(i, (float)this.result);
+                i = 0;
+                for(Float ff:list) {
+                    editor.putFloat("rank" + String.valueOf(i + 1), ff);
+                    i++;
+                }
+                editor.commit();
+                return;
+            }
+            i++;
+        }
+        Toast.makeText(getApplicationContext(), "げーむおーばー", Toast.LENGTH_SHORT).show();
+
     }
 }
