@@ -169,7 +169,13 @@ public class GameActivity extends AppCompatActivity {
         playerImage.setX(x - playerImage.getWidth() / 2);
     }
     public void setImageY(float y) {
-        playerImage.setY(y - sceneTop - playerImage.getHeight() / 2);
+        float tmpY = y - sceneTop;
+        if(tmpY < 0f) {
+            tmpY = 0f;
+        }else if(tmpY > sceneY) {
+            tmpY = sceneY;
+        }
+        playerImage.setY(tmpY - playerImage.getHeight() / 2);
     }
     public boolean collisionDetect() {
         float px = playerImage.getX();
