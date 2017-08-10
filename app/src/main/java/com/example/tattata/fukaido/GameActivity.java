@@ -244,4 +244,14 @@ public class GameActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "げーむおーばー", Toast.LENGTH_SHORT).show();
 
     }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        handler.removeCallbacks(r);
+    }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        handler.postDelayed(r, 80);
+    }
 }
