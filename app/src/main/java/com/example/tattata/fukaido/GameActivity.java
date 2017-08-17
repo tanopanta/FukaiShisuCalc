@@ -41,6 +41,7 @@ public class GameActivity extends AppCompatActivity {
     int sceneX;
     int sceneY;
     double result;
+    boolean isFirstFocus = true;
     Handler handler;
     Runnable r;
     List<Enemy> enemyList;
@@ -128,6 +129,10 @@ public class GameActivity extends AppCompatActivity {
     }
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
+        if(!isFirstFocus) {
+            return;
+        }
+        isFirstFocus = false;
         //Y座標の調整
         Rect rect = new Rect();
         Window window = getWindow();
